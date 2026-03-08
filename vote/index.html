@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitcher — Beta Feedback</title>
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    text-align: center;
+    padding: 60px 24px 40px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .logo { width: 48px; height: 48px; border-radius: 12px; margin: 0 auto 20px; }
+  .beta-badge {
+    display: inline-block;
+    background: rgba(124,58,237,0.15);
+    color: #a78bfa;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(124,58,237,0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #7C3AED, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p { font-size: 16px; color: #888; }
+
+  .proposals {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .proposal-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #111118;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+  }
+  .proposal-card:hover {
+    border-color: rgba(124,58,237,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124,58,237,0.1);
+  }
+  .proposal-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(99,102,241,0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .proposal-content { flex: 1; }
+  .proposal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .proposal-desc {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.4;
+  }
+  .proposal-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .proposal-stat {
+    font-size: 12px;
+    color: #a78bfa;
+    font-weight: 600;
+    background: rgba(124,58,237,0.1);
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+  .proposal-arrow {
+    font-size: 20px;
+    color: #444;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .proposal-card:hover .proposal-arrow { color: #7C3AED; }
+
+  .proposal-card.closed {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .proposal-card.closed .proposal-stat {
+    background: rgba(255,255,255,0.05);
+    color: #666;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #555;
+    padding-left: 4px;
+    margin-top: 20px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 24px;
+    color: #444;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer a { color: #7C3AED; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="../logo-256.png" class="logo" alt="Pitcher">
+  <div class="beta-badge">Beta Feedback</div>
+  <h1>Help Shape Pitcher</h1>
+  <p>Vote on design decisions and features. Your feedback directly influences what we build.</p>
+</div>
+
+<div class="proposals">
+  <div class="section-label">Active Proposals</div>
+
+  <a href="profile-cards.html" class="proposal-card" id="proposal-profile-cards">
+    <div class="proposal-icon">&#x1F0CF;</div>
+    <div class="proposal-content">
+      <div class="proposal-title">Profile Card Design</div>
+      <div class="proposal-desc">How should profiles look in the discovery feed? 4 concepts that put the friend's pitch front and center.</div>
+      <div class="proposal-meta">
+        <span class="proposal-stat">4 options</span>
+        <span class="proposal-stat" id="votes-profile-cards">Loading...</span>
+      </div>
+    </div>
+    <div class="proposal-arrow">&#x203A;</div>
+  </a>
+
+  <!-- Add more proposals here as needed:
+  <a href="new-proposal.html" class="proposal-card">
+    <div class="proposal-icon">EMOJI</div>
+    <div class="proposal-content">
+      <div class="proposal-title">Proposal Title</div>
+      <div class="proposal-desc">Description of what's being decided.</div>
+      <div class="proposal-meta">
+        <span class="proposal-stat">N options</span>
+        <span class="proposal-stat" id="votes-ID">Loading...</span>
+      </div>
+    </div>
+    <div class="proposal-arrow">&#x203A;</div>
+  </a>
+  -->
+</div>
+
+<div class="footer">
+  <p><a href="/">&#x2190; pafpitcher.app</a> &middot; This page is for beta testers only.</p>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ftvjmjrxfzuujmcgdebr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0dmptanJ4Znp1dWptY2dkZWJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMzA2NTIsImV4cCI6MjA4NzgwNjY1Mn0.HPoTCZBzoU2BT9XsbW5IbsD1liNS8XcU0FoVzJdgtic';
+
+async function loadVoteCounts() {
+  try {
+    // Profile cards votes
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/concept_votes?select=id`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const el = document.getElementById('votes-profile-cards');
+      if (el) el.textContent = `${data.length} vote${data.length !== 1 ? 's' : ''}`;
+    }
+  } catch { /* silent */ }
+}
+
+loadVoteCounts();
+</script>
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitcher — Help Us Design the Perfect Profile Card</title>
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Proposal nav */
+  .proposal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .proposal-nav a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+  .proposal-nav a:hover { color: #c4b5fd; }
+  .proposal-nav .nav-links {
+    display: flex;
+    gap: 16px;
+  }
+  .proposal-nav .nav-links a {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+  }
+  .proposal-nav .nav-links a.active { color: #a78bfa; }
+  .proposal-nav .nav-links a:hover { color: #a78bfa; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 60px 24px 40px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin: 0 auto 20px;
+  }
+  .header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #7C3AED, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p {
+    font-size: 16px;
+    color: #888;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .beta-badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.15);
+    color: #a78bfa;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    margin-bottom: 16px;
+  }
+
+  /* Concepts grid */
+  .concepts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+
+  /* Concept card */
+  .concept-card {
+    background: #111118;
+    border-radius: 20px;
+    border: 2px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .concept-card:hover {
+    border-color: rgba(124, 58, 237, 0.3);
+    transform: translateY(-2px);
+  }
+  .concept-card.selected {
+    border-color: #7C3AED;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+  }
+  .concept-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: #7C3AED;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+    z-index: 10;
+  }
+
+  /* Phone mockup inside card */
+  .phone-frame {
+    width: 280px;
+    height: 520px;
+    margin: 24px auto 0;
+    border-radius: 32px;
+    border: 2px solid #333;
+    background: #0d0d18;
+    overflow: hidden;
+    position: relative;
+  }
+  .phone-inner {
+    padding: 12px;
+    height: 100%;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .phone-inner::-webkit-scrollbar { display: none; }
+
+  /* Card info below phone */
+  .concept-info {
+    padding: 20px 24px 24px;
+    text-align: center;
+  }
+  .concept-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .concept-desc {
+    font-size: 13px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* Vote count */
+  .vote-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: #a78bfa;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  /* Shared mockup styles */
+  .mock-photo {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #2d1b69, #1a1a3e, #0d2137);
+  }
+  .mock-photo .emoji {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 56px;
+    opacity: 0.5;
+  }
+  .mock-photo .name-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    border-radius: 0 0 12px 12px;
+  }
+  .mock-photo .name-bar h3 { font-size: 18px; font-weight: 700; color: #fff; }
+  .mock-photo .name-bar .meta { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+  .mock-tag {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 14px;
+    padding: 3px 9px;
+    font-size: 10px;
+    color: #a78bfa;
+    margin: 2px;
+  }
+  .mock-prompt {
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .mock-prompt .q { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #7C3AED; margin-bottom: 3px; }
+  .mock-prompt .a { font-size: 12px; color: #ccc; line-height: 1.4; }
+  .mock-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding: 10px 0;
+  }
+  .mock-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 2px solid;
+  }
+  .mock-btn.pass { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.08); }
+  .mock-btn.super { border-color: #eab308; color: #eab308; background: rgba(234,179,8,0.08); }
+  .mock-btn.like { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.08); }
+
+  /* Pitcher badge */
+  .pitcher-av {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: linear-gradient(135deg, #7C3AED, #6366F1);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9px; color: white; font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* === Concept A specific === */
+  .a-pitch-header { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .a-pitch-header .lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #7C3AED; font-weight: 700; }
+  .a-pitch-header .nm { font-size: 11px; color: #a78bfa; font-weight: 600; }
+  .a-pitch-header .sc { font-size: 9px; color: #eab308; margin-left: auto; }
+  .a-bubble {
+    background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08));
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 14px 14px 14px 3px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d4c8ff;
+    font-style: italic;
+  }
+
+  /* === Concept B specific === */
+  .b-letter {
+    background: linear-gradient(170deg, #1a1528, #151520);
+    border: 1px solid rgba(124,58,237,0.18);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .b-header {
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(99,102,241,0.08));
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px dashed rgba(124,58,237,0.15);
+  }
+  .b-header .from-lbl { font-size: 9px; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+  .b-header .from-nm { font-size: 12px; font-weight: 600; color: #ccc; }
+  .b-header .stamp { width: 28px; height: 28px; border-radius: 4px; background: rgba(124,58,237,0.1); border: 1px dashed rgba(124,58,237,0.25); display: flex; align-items: center; justify-content: center; font-size: 14px; margin-left: auto; }
+  .b-body { padding: 12px; }
+  .b-greeting { font-size: 11px; color: #666; font-style: italic; margin-bottom: 6px; }
+  .b-text { font-size: 13px; line-height: 1.5; color: #d0d0d0; margin-bottom: 10px; }
+  .b-photos { display: flex; gap: 6px; margin-bottom: 10px; }
+  .b-photos .mock-photo { flex: 1; height: 100px; }
+  .b-sign { font-size: 11px; color: #666; font-style: italic; text-align: right; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.05); }
+  .b-details { padding: 10px 12px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.03); }
+  .b-row { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; }
+  .b-row .l { color: #555; }
+  .b-row .v { color: #a78bfa; font-weight: 500; }
+
+  /* === Concept C specific === */
+  .c-story { width: 100%; height: 430px; border-radius: 14px; overflow: hidden; position: relative; background: #111; }
+  .c-progress { display: flex; gap: 3px; padding: 8px 10px 0; position: absolute; top: 0; left: 0; right: 0; z-index: 5; }
+  .c-bar { flex: 1; height: 2.5px; border-radius: 2px; background: rgba(255,255,255,0.2); }
+  .c-bar.seen { background: rgba(255,255,255,0.5); }
+  .c-bar.active { background: #fff; }
+  .c-bg { position: absolute; inset: 0; }
+  .c-slide { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; z-index: 4; }
+  .c-pitch-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(124,58,237,0.3); backdrop-filter: blur(8px);
+    border-radius: 14px; padding: 4px 10px;
+    font-size: 10px; color: #e0d4ff; font-weight: 600; margin-bottom: 8px;
+  }
+  .c-pitch-text { font-size: 17px; font-weight: 600; line-height: 1.35; color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
+  .c-slides { display: flex; gap: 5px; margin-top: 8px; }
+  .c-mini { flex: 1; height: 56px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; color: #666; gap: 2px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); }
+  .c-mini.active { border-color: rgba(124,58,237,0.35); background: rgba(124,58,237,0.08); color: #a78bfa; }
+  .c-mini .ic { font-size: 16px; }
+
+  /* === Concept D specific === */
+  .d-card { border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+  .d-top {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.06));
+    padding: 12px;
+    border-bottom: 2px solid rgba(124,58,237,0.15);
+  }
+  .d-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.2px; color: #7C3AED; font-weight: 800; margin-bottom: 8px; }
+  .d-pitcher-row { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .d-pitcher-nm { font-size: 12px; font-weight: 600; color: #a78bfa; }
+  .d-pitcher-sc { margin-left: auto; font-size: 10px; color: #eab308; }
+  .d-pitch { font-size: 13px; line-height: 1.5; color: #d0d0d0; }
+  .d-bottom { background: rgba(0,0,0,0.25); padding: 0; }
+  .d-bottom-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1.2px; color: #555; font-weight: 800; padding: 10px 12px 0; }
+  .d-profile-row { display: flex; gap: 10px; padding: 8px 12px; align-items: center; }
+  .d-mini-photo { width: 60px; height: 72px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+  .d-info h3 { font-size: 16px; font-weight: 700; color: #fff; }
+  .d-info .meta { font-size: 11px; color: #888; margin-top: 1px; }
+  .d-info .bio { font-size: 11px; color: #aaa; margin-top: 4px; line-height: 1.4; }
+  .d-section { padding: 8px 12px 12px; }
+
+  /* Feedback form */
+  .feedback-section {
+    max-width: 580px;
+    margin: 0 auto 60px;
+    padding: 0 24px;
+  }
+  .feedback-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .feedback-section .sub {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #aaa;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #e0e0e0;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: rgba(124, 58, 237, 0.5);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #7C3AED, #3B82F6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #22c55e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Results bar */
+  .results-section {
+    max-width: 580px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+    display: none;
+  }
+  .results-section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #888;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .result-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .result-label {
+    width: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #aaa;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .result-track {
+    flex: 1;
+    height: 28px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .result-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7C3AED, #3B82F6);
+    border-radius: 8px;
+    transition: width 0.6s ease;
+    min-width: 0;
+  }
+  .result-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a78bfa;
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px 24px;
+    color: #444;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .footer a { color: #7C3AED; }
+
+  @media (max-width: 720px) {
+    .concepts { grid-template-columns: 1fr; max-width: 400px; }
+    .phone-frame { width: 260px; height: 480px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="proposal-nav">
+  <a href="index.html">&#x2190; All Proposals</a>
+  <div class="nav-links">
+    <a href="profile-cards.html" class="active">Profile Cards</a>
+    <!-- Add links to new proposals here -->
+  </div>
+</nav>
+
+<div class="header">
+  <img src="../logo-256.png" class="logo" alt="Pitcher">
+  <div class="beta-badge">Beta Feedback</div>
+  <h1>Help Us Design the Perfect Profile Card</h1>
+  <p>Pitcher is a dating app where friends pitch friends. We're rethinking how profiles should look. Pick the concept that feels most exciting to you.</p>
+</div>
+
+<div class="concepts" id="concepts">
+
+  <!-- CONCEPT A: Pitch-First -->
+  <div class="concept-card" data-concept="pitch_first" onclick="selectConcept(this)">
+    <div class="phone-frame">
+      <div class="phone-inner">
+        <div class="a-pitch-header">
+          <div class="pitcher-av">E</div>
+          <div><div class="a-lbl" style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:#7C3AED;font-weight:700;">Pitched by</div><div class="a-nm" style="font-size:11px;color:#a78bfa;font-weight:600;">Emma K.</div></div>
+          <div style="font-size:9px;color:#eab308;margin-left:auto;">&#x1F498; 4.8</div>
+        </div>
+        <div class="a-bubble">"Trust me on this one — Sarah is the funniest person I know. She'll roast you in the best way."</div>
+        <div class="mock-photo" style="height:200px;margin-bottom:10px;">
+          <div class="emoji">&#x1F469;&#x1F3FB;</div>
+          <div class="name-bar"><h3>Sarah, 27</h3><div class="meta">&#x1F4CD; 3km · Designer</div></div>
+        </div>
+        <div class="mock-prompt" style="margin-bottom:8px;">
+          <div class="q">My ideal Sunday</div>
+          <div class="a">Farmers market &#x2192; cook ambitiously &#x2192; fail &#x2192; order pizza</div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span class="mock-tag">&#x1F3A8; Design</span>
+          <span class="mock-tag">&#x1F431; Cats</span>
+          <span class="mock-tag">&#x1F355; Cooking</span>
+        </div>
+        <div class="mock-buttons">
+          <div class="mock-btn pass">&#x2715;</div>
+          <div class="mock-btn super">&#x2B50;</div>
+          <div class="mock-btn like">&#x2665;</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <div class="concept-name">A. Pitch-First</div>
+      <div class="concept-desc">The friend's endorsement is the first thing you see. Their words sell the person — photos support it.</div>
+      <div class="vote-count" id="count-pitch_first">&#x1F44D; <span>0</span> votes</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT B: Letter -->
+  <div class="concept-card" data-concept="letter" onclick="selectConcept(this)">
+    <div class="phone-frame">
+      <div class="phone-inner">
+        <div class="b-letter">
+          <div class="b-header">
+            <div class="pitcher-av">J</div>
+            <div><div class="b-header .from-lbl" style="font-size:9px;color:#7C3AED;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;">A pitch from</div><div style="font-size:12px;font-weight:600;color:#ccc;">Jake M.</div></div>
+            <div class="b-header .stamp" style="width:28px;height:28px;border-radius:4px;background:rgba(124,58,237,0.1);border:1px dashed rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-size:14px;margin-left:auto;">&#x1F48C;</div>
+          </div>
+          <div class="b-body">
+            <div class="b-greeting">Hey, you should meet my friend...</div>
+            <div class="b-text">This is Sarah. We've been friends since college. She remembers your coffee order after meeting you once. Funny without trying.</div>
+            <div class="b-photos">
+              <div class="mock-photo" style="height:80px;flex:1;"><div class="emoji" style="font-size:36px;">&#x1F469;&#x1F3FB;</div></div>
+              <div class="mock-photo" style="height:80px;flex:1;"><div class="emoji" style="font-size:36px;">&#x1F3B8;</div></div>
+            </div>
+            <div class="b-sign">— Jake &#x1F498; 4.6 (8 pitches)</div>
+          </div>
+          <div class="b-details">
+            <div class="b-row"><span class="l">Name</span><span class="v">Sarah, 27</span></div>
+            <div class="b-row"><span class="l">Lives</span><span class="v">3km away</span></div>
+            <div class="b-row"><span class="l">Works</span><span class="v">Product Designer</span></div>
+            <div class="b-row"><span class="l">Into</span><span class="v">Design, Cats, Cooking</span></div>
+          </div>
+        </div>
+        <div class="mock-buttons">
+          <div class="mock-btn pass">&#x2715;</div>
+          <div class="mock-btn super">&#x2B50;</div>
+          <div class="mock-btn like">&#x2665;</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <div class="concept-name">B. Letter / Postcard</div>
+      <div class="concept-desc">A personal recommendation from the friend. Warm and intimate — like getting a note, not swiping a card.</div>
+      <div class="vote-count" id="count-letter">&#x1F44D; <span>0</span> votes</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT C: Story Slides -->
+  <div class="concept-card" data-concept="story_slides" onclick="selectConcept(this)">
+    <div class="phone-frame">
+      <div class="phone-inner" style="padding:8px;">
+        <div class="c-story">
+          <div class="c-progress">
+            <div class="c-bar seen"></div>
+            <div class="c-bar active"></div>
+            <div class="c-bar"></div>
+            <div class="c-bar"></div>
+          </div>
+          <div class="c-bg">
+            <div class="mock-photo" style="height:100%;border-radius:0;">
+              <div class="emoji" style="font-size:80px;opacity:0.25;">&#x1F469;&#x1F3FB;</div>
+            </div>
+          </div>
+          <div class="c-slide">
+            <div class="c-pitch-badge">
+              <div class="pitcher-av" style="width:16px;height:16px;font-size:8px;">E</div>
+              Emma's pitch
+            </div>
+            <div class="c-pitch-text">"She's the friend everyone wishes they had. Loyal, hilarious, best playlists."</div>
+          </div>
+        </div>
+        <div class="c-slides">
+          <div class="c-mini"><span class="ic">&#x1F4F8;</span><span>Photo</span></div>
+          <div class="c-mini active"><span class="ic">&#x1F4E3;</span><span>Pitch</span></div>
+          <div class="c-mini"><span class="ic">&#x1F4AC;</span><span>Prompts</span></div>
+          <div class="c-mini"><span class="ic">&#x2728;</span><span>About</span></div>
+        </div>
+        <div class="mock-buttons">
+          <div class="mock-btn pass">&#x2715;</div>
+          <div class="mock-btn super">&#x2B50;</div>
+          <div class="mock-btn like">&#x2665;</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <div class="concept-name">C. Story Slides</div>
+      <div class="concept-desc">Tap through like Instagram stories. Each tap reveals a new layer — photo, pitch, prompts, about.</div>
+      <div class="vote-count" id="count-story_slides">&#x1F44D; <span>0</span> votes</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT D: Split Card -->
+  <div class="concept-card" data-concept="split_card" onclick="selectConcept(this)">
+    <div class="phone-frame">
+      <div class="phone-inner">
+        <div class="d-card">
+          <div class="d-top">
+            <div class="d-label">&#x1F3A4; The Pitch</div>
+            <div class="d-pitcher-row">
+              <div class="pitcher-av">E</div>
+              <div class="d-pitcher-nm">Emma K.</div>
+              <div class="d-pitcher-sc">&#x1F498; 4.8</div>
+            </div>
+            <div class="d-pitch">"Trust me — Sarah is the funniest person I know. Kind heart, zero drama, actually reads books."</div>
+          </div>
+          <div class="d-bottom">
+            <div class="d-bottom-label">&#x1F464; The Profile</div>
+            <div class="d-profile-row">
+              <div class="d-mini-photo">
+                <div class="mock-photo" style="height:100%;border-radius:8px;"><div class="emoji" style="font-size:30px;">&#x1F469;&#x1F3FB;</div></div>
+              </div>
+              <div class="d-info">
+                <h3>Sarah, 27</h3>
+                <div class="meta">&#x1F4CD; 3km · Designer</div>
+                <div class="bio">Cat person. Will beat you at Scrabble.</div>
+              </div>
+            </div>
+            <div class="d-section">
+              <div class="mock-prompt" style="margin-bottom:8px;">
+                <div class="q">My ideal Sunday</div>
+                <div class="a">Farmers market &#x2192; cook &#x2192; fail &#x2192; pizza</div>
+              </div>
+              <div>
+                <span class="mock-tag">&#x1F3A8; Design</span>
+                <span class="mock-tag">&#x1F431; Cats</span>
+                <span class="mock-tag">&#x1F355; Cooking</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-buttons">
+          <div class="mock-btn pass">&#x2715;</div>
+          <div class="mock-btn super">&#x2B50;</div>
+          <div class="mock-btn like">&#x2665;</div>
+        </div>
+      </div>
+    </div>
+    <div class="concept-info">
+      <div class="concept-name">D. Split Card</div>
+      <div class="concept-desc">Two clear sections: what the friend says (the pitch) vs who they are (the profile). Two perspectives, one card.</div>
+      <div class="vote-count" id="count-split_card">&#x1F44D; <span>0</span> votes</div>
+    </div>
+  </div>
+</div>
+
+<!-- Results (shown after voting) -->
+<div class="results-section" id="results">
+  <h3>Current Results</h3>
+  <div class="result-bar">
+    <div class="result-label">Pitch-First</div>
+    <div class="result-track"><div class="result-fill" id="bar-pitch_first" style="width:0%"></div></div>
+    <div class="result-count" id="pct-pitch_first">0</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-label">Letter</div>
+    <div class="result-track"><div class="result-fill" id="bar-letter" style="width:0%"></div></div>
+    <div class="result-count" id="pct-letter">0</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-label">Story Slides</div>
+    <div class="result-track"><div class="result-fill" id="bar-story_slides" style="width:0%"></div></div>
+    <div class="result-count" id="pct-story_slides">0</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-label">Split Card</div>
+    <div class="result-track"><div class="result-fill" id="bar-split_card" style="width:0%"></div></div>
+    <div class="result-count" id="pct-split_card">0</div>
+  </div>
+</div>
+
+<!-- Feedback form -->
+<div class="feedback-section" id="feedback-form">
+  <h2>Cast Your Vote</h2>
+  <p class="sub">Click a concept above to select it, then submit your vote.</p>
+  <form id="vote-form" onsubmit="submitVote(event)">
+    <div class="form-group">
+      <label>Your name (optional)</label>
+      <input type="text" id="voter-name" placeholder="First name or nickname">
+    </div>
+    <div class="form-group">
+      <label>Any thoughts or suggestions?</label>
+      <textarea id="voter-comment" placeholder="What do you like about your pick? Any ideas to mix concepts?"></textarea>
+    </div>
+    <button type="submit" class="submit-btn" id="submit-btn" disabled>Select a concept above to vote</button>
+  </form>
+</div>
+
+<div class="toast" id="toast">Vote submitted! Thanks for your feedback.</div>
+
+<div class="footer">
+  <p><a href="index.html">&#x2190; All Proposals</a> &middot; <a href="/">pafpitcher.app</a></p>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ftvjmjrxfzuujmcgdebr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0dmptanJ4Znp1dWptY2dkZWJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMzA2NTIsImV4cCI6MjA4NzgwNjY1Mn0.HPoTCZBzoU2BT9XsbW5IbsD1liNS8XcU0FoVzJdgtic';
+
+let selectedConcept = null;
+
+function selectConcept(card) {
+  document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedConcept = card.dataset.concept;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = false;
+  const names = { pitch_first: 'Pitch-First', letter: 'Letter', story_slides: 'Story Slides', split_card: 'Split Card' };
+  btn.textContent = `Vote for ${names[selectedConcept]}`;
+}
+
+async function submitVote(e) {
+  e.preventDefault();
+  if (!selectedConcept) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const payload = {
+    concept: selectedConcept,
+    voter_name: document.getElementById('voter-name').value.trim() || null,
+    comment: document.getElementById('voter-comment').value.trim() || null
+  };
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/concept_votes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showToast();
+      btn.textContent = 'Vote submitted!';
+      loadResults();
+    } else {
+      btn.textContent = 'Something went wrong — try again';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = 'Network error — try again';
+    btn.disabled = false;
+  }
+}
+
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+async function loadResults() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/concept_votes?select=concept`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const counts = { pitch_first: 0, letter: 0, story_slides: 0, split_card: 0 };
+    data.forEach(v => { if (counts.hasOwnProperty(v.concept)) counts[v.concept]++; });
+    const total = data.length || 1;
+
+    Object.keys(counts).forEach(key => {
+      const pct = Math.round((counts[key] / total) * 100);
+      const countEl = document.querySelector(`#count-${key} span`);
+      if (countEl) countEl.textContent = counts[key];
+
+      const bar = document.getElementById(`bar-${key}`);
+      if (bar) bar.style.width = `${pct}%`;
+
+      const pctEl = document.getElementById(`pct-${key}`);
+      if (pctEl) pctEl.textContent = counts[key];
+    });
+
+    document.getElementById('results').style.display = 'block';
+  } catch { /* silent */ }
+}
+
+// Load current results on page load
+loadResults();
+</script>
+</body>
+</html>
